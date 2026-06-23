@@ -309,6 +309,7 @@ h1 {
   display: flex;
   font-size: 11px;
   justify-content: space-between;
+  letter-spacing: 0.02em;
 }
 
 .slot {
