@@ -60,6 +60,7 @@ export type BracketSlot = {
 
 export type BracketMatch = {
   id: string;
+  matchNo: number;
   round: "R32" | "R16" | "QF" | "SF" | "FINAL";
   label: string;
   dateLabel: string;

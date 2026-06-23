@@ -242,7 +242,8 @@ h1 {
 }
 
 .treeMatch,
-.finalMatch {
+.finalMatch,
+.thirdPlaceMatch {
   align-self: center;
   background: rgba(255, 255, 255, 0.055);
   border: 1px solid rgba(255, 255, 255, 0.16);
@@ -259,6 +260,10 @@ h1 {
   background: rgba(255, 255, 255, 0.035);
 }
 
+.futureMatch .slot {
+  min-height: 34px;
+}
+
 .finalMatch {
   align-content: center;
   background: rgba(255, 210, 71, 0.09);
@@ -266,9 +271,23 @@ h1 {
   min-height: 190px;
 }
 
+.thirdPlaceMatch {
+  align-content: center;
+  background: transparent;
+  border-color: transparent;
+  min-height: 130px;
+}
+
 .finalTitle {
   color: var(--accent);
   font-size: 17px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.thirdPlaceTitle {
+  color: var(--accent);
+  font-size: 15px;
   font-weight: 900;
   text-align: center;
 }
@@ -301,6 +320,10 @@ h1 {
   padding: 6px 8px;
 }
 
+.treeMatch:not(.futureMatch) .slot {
+  min-height: 34px;
+}
+
 .futureSlot {
   background: rgba(238, 246, 255, 0.84);
 }
@@ -310,6 +333,10 @@ h1 {
   display: block;
   font-size: 10px;
   font-weight: 700;
+}
+
+.treeMatch:not(.futureMatch) .slotLabel {
+  display: none;
 }
 
 .slotTeam {
@@ -415,6 +442,33 @@ h1 {
   width: 100%;
 }
 
+.centerFinalLine {
+  align-self: center;
+  border-left: 2px solid rgba(237, 245, 255, 0.82);
+  height: 58px;
+  justify-self: center;
+  position: relative;
+  width: 2px;
+  z-index: 1;
+}
+
+.centerFinalLine::before,
+.centerFinalLine::after {
+  border-top: 2px solid rgba(237, 245, 255, 0.82);
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 58px;
+}
+
+.centerFinalLine::before {
+  right: 0;
+}
+
+.centerFinalLine::after {
+  left: 0;
+}
+
 .thirdList {
   display: grid;
   gap: 8px;
@@ -495,4 +549,19 @@ h1 {
   .bracketTree {
     min-width: 1240px;
   }
+}
+
+.bracketLines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.bracketLines path {
+  fill: none;
+  stroke: rgba(157, 190, 227, 0.72);
+  stroke-width: 2;
 }

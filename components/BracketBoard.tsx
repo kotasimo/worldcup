@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { getCountryNameJa } from "@/lib/country-names";
 import { getFlagCode } from "@/lib/flags";
 import type { BracketMatch, BracketProjection, BracketSlot, GroupTable, Team, TeamStanding } from "@/lib/types";
 
@@ -52,77 +53,35 @@ export function BracketBoard({ projection, tables }: Props) {
         </div>
 
         <div className="bracketTree">
+          <BracketLines />
+
           {projection.matches.slice(0, 8).map((match, index) => (
-            <MatchNode column={1} key={match.id} match={match} matchNo={index + 1} row={r32Rows[index]} />
+            <MatchNode column={1} key={match.id} match={match} row={r32Rows[index]} />
           ))}
 
           {projection.matches.slice(8, 16).map((match, index) => (
-            <MatchNode column={15} key={match.id} match={match} matchNo={index + 9} row={r32Rows[index]} />
+            <MatchNode column={15} key={match.id} match={match} row={r32Rows[index]} />
           ))}
 
-          {[0, 1, 2, 3].map((index) => (
-            <FutureNode
-              column={3}
-              key={`l-r16-${index}`}
-              matchNo={17 + index}
-              row={r16Rows[index]}
-              slots={[`M${index * 2 + 1} 勝者`, `M${index * 2 + 2} 勝者`]}
-              title="ラウンド16"
-            />
-          ))}
-          {[0, 1, 2, 3].map((index) => (
-            <FutureNode
-              column={13}
-              key={`r-r16-${index}`}
-              matchNo={21 + index}
-              row={r16Rows[index]}
-              slots={[`M${index * 2 + 9} 勝者`, `M${index * 2 + 10} 勝者`]}
-              title="ラウンド16"
-            />
-          ))}
+          <FutureNode column={3} matchNo={89} row={r16Rows[0]} />
+          <FutureNode column={3} matchNo={90} row={r16Rows[1]} />
+          <FutureNode column={3} matchNo={93} row={r16Rows[2]} />
+          <FutureNode column={3} matchNo={94} row={r16Rows[3]} />
 
-          {[0, 1].map((index) => (
-            <FutureNode
-              column={5}
-              key={`l-qf-${index}`}
-              matchNo={25 + index}
-              row={qfRows[index]}
-              slots={[`M${17 + index * 2} 勝者`, `M${18 + index * 2} 勝者`]}
-              title="準々決勝"
-            />
-          ))}
-          {[0, 1].map((index) => (
-            <FutureNode
-              column={11}
-              key={`r-qf-${index}`}
-              matchNo={27 + index}
-              row={qfRows[index]}
-              slots={[`M${21 + index * 2} 勝者`, `M${22 + index * 2} 勝者`]}
-              title="準々決勝"
-            />
-          ))}
+          <FutureNode column={13} matchNo={91} row={r16Rows[0]} />
+          <FutureNode column={13} matchNo={92} row={r16Rows[1]} />
+          <FutureNode column={13} matchNo={95} row={r16Rows[2]} />
+          <FutureNode column={13} matchNo={96} row={r16Rows[3]} />
 
-          <FutureNode column={7} matchNo={29} row={8} slots={["M25 勝者", "M26 勝者"]} title="準決勝" />
-          <FutureNode column={9} matchNo={30} row={8} slots={["M27 勝者", "M28 勝者"]} title="準決勝" />
+          <FutureNode column={5} matchNo={97} row={qfRows[0]} />
+          <FutureNode column={5} matchNo={98} row={qfRows[1]} />
+          <FutureNode column={11} matchNo={99} row={qfRows[0]} />
+          <FutureNode column={11} matchNo={100} row={qfRows[1]} />
+
+          <FutureNode column={7} matchNo={101} row={8} />
+          <FutureNode column={9} matchNo={102} row={8} />
           <FinalNode />
-
-          {[1, 5, 9, 13].map((row, index) => (
-            <Connector column={2} direction="left" key={`lc1-${row}`} row={row} span={4} />
-          ))}
-          {[2, 10].map((row) => (
-            <Connector column={4} direction="left" key={`lc2-${row}`} row={row} span={8} />
-          ))}
-          <Connector column={6} direction="left" row={4} span={10} />
-          <Connector column={8} direction="left" row={8} span={2} slim />
-
-          {[1, 5, 9, 13].map((row) => (
-            <Connector column={14} direction="right" key={`rc1-${row}`} row={row} span={4} />
-          ))}
-          {[2, 10].map((row) => (
-            <Connector column={12} direction="right" key={`rc2-${row}`} row={row} span={8} />
-          ))}
-          <Connector column={10} direction="right" row={4} span={10} />
-          <Connector column={8} direction="right" row={10} span={2} slim />
+          <ThirdPlaceNode />
         </div>
       </section>
 
@@ -134,76 +93,63 @@ export function BracketBoard({ projection, tables }: Props) {
           ))}
         </div>
         <p className="note">
-          3位枠は候補グループに合う上位チームを重複なしで暫定配置しています。APIキー未設定時はサンプルデータで表示します。
+          3位枠はAnnex C相当の割り当て表を参照します。表を取得できない場合のみ候補グループ内で暫定配置します。
         </p>
       </aside>
     </div>
   );
 }
 
-function MatchNode({
-  column,
-  match,
-  matchNo,
-  row,
-}: {
-  column: number;
-  match: BracketMatch;
-  matchNo: number;
-  row: number;
-}) {
-  return (
-    <article className="treeMatch" style={{ gridColumn: column, gridRow: `${row} / span 2` }}>
-      <div className="matchMeta">
-        <span>M{matchNo}</span>
-        <span>{match.dateLabel}</span>
-      </div>
-      <TeamSlot slot={match.home} />
-      <TeamSlot slot={match.away} />
-    </article>
-  );
-}
-
-function FutureNode({
-  column,
-  matchNo,
-  row,
-  slots,
-  title,
-}: {
-  column: number;
-  matchNo: number;
-  row: number;
-  slots: [string, string];
-  title: string;
-}) {
+function FutureNode({ column, matchNo, row }: { column: number; matchNo: number; row: number }) {
   return (
     <article className="treeMatch futureMatch" style={{ gridColumn: column, gridRow: `${row} / span 2` }}>
       <div className="matchMeta">
         <span>M{matchNo}</span>
-        <span>{title}</span>
+        <span />
       </div>
-      <div className="slot futureSlot">
-        <span className="slotTeam empty">{slots[0]}</span>
-      </div>
-      <div className="slot futureSlot">
-        <span className="slotTeam empty">{slots[1]}</span>
-      </div>
+      <div className="slot futureSlot" />
+      <div className="slot futureSlot" />
     </article>
   );
 }
 
 function FinalNode() {
   return (
-    <article className="finalMatch" style={{ gridColumn: 8, gridRow: "7 / span 5" }}>
+    <article className="finalMatch" style={{ gridColumn: 8, gridRow: "7 / span 4" }}>
       <div className="finalTitle">決勝</div>
-      <div className="slot futureSlot">
-        <span className="slotTeam empty">M29 勝者</span>
+      <div className="slot futureSlot" />
+      <div className="slot futureSlot" />
+    </article>
+  );
+}
+
+function ThirdPlaceNode() {
+  return (
+    <article className="thirdPlaceMatch" style={{ gridColumn: 8, gridRow: "13 / span 3" }}>
+      <div className="thirdPlaceTitle">3位決定戦</div>
+      <div className="slot futureSlot" />
+      <div className="slot futureSlot" />
+    </article>
+  );
+}
+
+function MatchNode({
+  column,
+  match,
+  row,
+}: {
+  column: number;
+  match: BracketMatch;
+  row: number;
+}) {
+  return (
+    <article className="treeMatch" style={{ gridColumn: column, gridRow: `${row} / span 2` }}>
+      <div className="matchMeta">
+        <span>M{match.matchNo}</span>
+        <span>{match.dateLabel}</span>
       </div>
-      <div className="slot futureSlot">
-        <span className="slotTeam empty">M30 勝者</span>
-      </div>
-      <div className="championSlot">優勝</div>
+      <TeamSlot slot={match.home} />
+      <TeamSlot slot={match.away} />
     </article>
   );
 }
@@ -225,12 +171,14 @@ function TeamSlot({ slot }: { slot: BracketSlot }) {
 
 function Connector({
   column,
+  columnSpan = 1,
   direction,
   row,
   slim = false,
   span,
 }: {
   column: number;
+  columnSpan?: number;
   direction: "left" | "right";
   row: number;
   slim?: boolean;
@@ -239,7 +187,7 @@ function Connector({
   return (
     <div
       className={`connector ${direction} ${slim ? "slim" : ""}`}
-      style={{ gridColumn: column, gridRow: `${row} / span ${span}` }}
+      style={{ gridColumn: `${column} / span ${columnSpan}`, gridRow: `${row} / span ${span}` }}
     >
       <span />
     </div>
@@ -265,6 +213,32 @@ function formatGoalDifference(value: number) {
   return value > 0 ? `+${value}` : String(value);
 }
 
+function BracketLines() {
+  return (
+    <svg className="bracketLines" viewBox="0 0 1504 768" preserveAspectRatio="none">
+      <path d="M170 48 H184 V96 H198 M170 144 H184" />
+      <path d="M170 240 H184 V288 H198 M170 336 H184" />
+      <path d="M170 432 H184 V480 H198 M170 528 H184" />
+      <path d="M170 624 H184 V672 H198 M170 720 H184" />
+
+      <path d="M354 96 H368 V192 H382 M354 288 H368" />
+      <path d="M354 480 H368 V576 H382 M354 672 H368" />
+      <path d="M528 192 H542 V384 H556 M528 576 H542" />
+      <path d="M692 384 H752" />
+
+      <path d="M1334 48 H1320 V96 H1306 M1334 144 H1320" />
+      <path d="M1334 240 H1320 V288 H1306 M1334 336 H1320" />
+      <path d="M1334 432 H1320 V480 H1306 M1334 528 H1320" />
+      <path d="M1334 624 H1320 V672 H1306 M1334 720 H1320" />
+
+      <path d="M1150 96 H1136 V192 H1122 M1150 288 H1136" />
+      <path d="M1150 480 H1136 V576 H1122 M1150 672 H1136" />
+      <path d="M976 192 H962 V384 H948 M976 576 H962" />
+      <path d="M812 384 H752" />
+    </svg>
+  );
+}
+
 function TeamName({ team }: { team: Team }) {
   const code = getFlagCode(team.name, team.tla);
 
@@ -282,7 +256,7 @@ function TeamName({ team }: { team: Team }) {
       ) : (
         <span className="flagFallback" />
       )}
-      <span>{team.shortName}</span>
+      <span>{getCountryNameJa(team)}</span>
     </span>
   );
 }

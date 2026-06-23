@@ -11,7 +11,7 @@ export type WorldCupViewModel = {
 export async function getWorldCupViewModel(): Promise<WorldCupViewModel> {
   const state = await fetchWorldCupState();
   const tables = calculateGroupTables(state.teams, state.matches);
-  const projection = buildBracketProjection(tables);
+  const projection = await buildBracketProjection(tables);
 
   return {
     state,

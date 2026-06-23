@@ -8,6 +8,7 @@ import type {
   Team,
   TeamStanding,
 } from "./types";
+import { getOfficialThirdPlaceAssignments } from "./third-place";
 
 const groupCodes = "ABCDEFGHIJKL".split("") as GroupCode[];
 
@@ -17,6 +18,7 @@ type SlotSource =
 
 type MatchTemplate = {
   id: string;
+  matchNo: number;
   round: BracketMatch["round"];
   label: string;
   dateLabel: string;
@@ -26,31 +28,71 @@ type MatchTemplate = {
 
 const r32Templates: MatchTemplate[] = [
   {
-    id: "r32-1",
+    id: "m74",
+    matchNo: 74,
+    round: "R32",
+    label: "ラウンド32",
+    dateLabel: "6/29",
+    home: { type: "group", group: "E", rank: 1 },
+    away: { type: "third", candidates: ["A", "B", "C", "D", "F"] },
+  },
+  {
+    id: "m77",
+    matchNo: 77,
     round: "R32",
     label: "ラウンド32",
     dateLabel: "6/30",
-    home: { type: "group", group: "A", rank: 1 },
-    away: { type: "third", candidates: ["C", "D", "E", "F", "I"] },
+    home: { type: "group", group: "I", rank: 1 },
+    away: { type: "third", candidates: ["C", "D", "F", "G", "H"] },
   },
   {
-    id: "r32-2",
+    id: "m73",
+    matchNo: 73,
     round: "R32",
     label: "ラウンド32",
-    dateLabel: "6/30",
-    home: { type: "group", group: "C", rank: 1 },
-    away: { type: "third", candidates: ["D", "F", "G", "H"] },
+    dateLabel: "6/28",
+    home: { type: "group", group: "A", rank: 2 },
+    away: { type: "group", group: "B", rank: 2 },
   },
   {
-    id: "r32-3",
+    id: "m75",
+    matchNo: 75,
+    round: "R32",
+    label: "ラウンド32",
+    dateLabel: "6/29",
+    home: { type: "group", group: "F", rank: 1 },
+    away: { type: "group", group: "C", rank: 2 },
+  },
+  {
+    id: "m83",
+    matchNo: 83,
+    round: "R32",
+    label: "ラウンド32",
+    dateLabel: "7/2",
+    home: { type: "group", group: "K", rank: 2 },
+    away: { type: "group", group: "L", rank: 2 },
+  },
+  {
+    id: "m84",
+    matchNo: 84,
+    round: "R32",
+    label: "ラウンド32",
+    dateLabel: "7/2",
+    home: { type: "group", group: "H", rank: 1 },
+    away: { type: "group", group: "J", rank: 2 },
+  },
+  {
+    id: "m81",
+    matchNo: 81,
     round: "R32",
     label: "ラウンド32",
     dateLabel: "7/1",
-    home: { type: "group", group: "B", rank: 2 },
-    away: { type: "third", candidates: ["E", "F", "I", "J"] },
+    home: { type: "group", group: "D", rank: 1 },
+    away: { type: "third", candidates: ["B", "E", "F", "I", "J"] },
   },
   {
-    id: "r32-4",
+    id: "m82",
+    matchNo: 82,
     round: "R32",
     label: "ラウンド32",
     dateLabel: "7/1",
@@ -58,100 +100,76 @@ const r32Templates: MatchTemplate[] = [
     away: { type: "third", candidates: ["A", "E", "H", "I", "J"] },
   },
   {
-    id: "r32-5",
+    id: "m76",
+    matchNo: 76,
+    round: "R32",
+    label: "ラウンド32",
+    dateLabel: "6/29",
+    home: { type: "group", group: "C", rank: 1 },
+    away: { type: "group", group: "F", rank: 2 },
+  },
+  {
+    id: "m78",
+    matchNo: 78,
+    round: "R32",
+    label: "ラウンド32",
+    dateLabel: "6/30",
+    home: { type: "group", group: "E", rank: 2 },
+    away: { type: "group", group: "I", rank: 2 },
+  },
+  {
+    id: "m79",
+    matchNo: 79,
+    round: "R32",
+    label: "ラウンド32",
+    dateLabel: "6/30",
+    home: { type: "group", group: "A", rank: 1 },
+    away: { type: "third", candidates: ["C", "E", "F", "H", "I"] },
+  },
+  {
+    id: "m80",
+    matchNo: 80,
+    round: "R32",
+    label: "ラウンド32",
+    dateLabel: "7/1",
+    home: { type: "group", group: "L", rank: 1 },
+    away: { type: "third", candidates: ["E", "H", "I", "J", "K"] },
+  },
+  {
+    id: "m86",
+    matchNo: 86,
+    round: "R32",
+    label: "ラウンド32",
+    dateLabel: "7/3",
+    home: { type: "group", group: "J", rank: 1 },
+    away: { type: "group", group: "H", rank: 2 },
+  },
+  {
+    id: "m88",
+    matchNo: 88,
+    round: "R32",
+    label: "ラウンド32",
+    dateLabel: "7/3",
+    home: { type: "group", group: "D", rank: 2 },
+    away: { type: "group", group: "G", rank: 2 },
+  },
+  {
+    id: "m85",
+    matchNo: 85,
     round: "R32",
     label: "ラウンド32",
     dateLabel: "7/2",
     home: { type: "group", group: "B", rank: 1 },
-    away: { type: "third", candidates: ["E", "F", "I", "J", "K"] },
+    away: { type: "third", candidates: ["E", "F", "G", "I", "J"] },
   },
   {
-    id: "r32-6",
-    round: "R32",
-    label: "ラウンド32",
-    dateLabel: "7/2",
-    home: { type: "group", group: "F", rank: 1 },
-    away: { type: "third", candidates: ["H", "I", "J", "K"] },
-  },
-  {
-    id: "r32-7",
-    round: "R32",
-    label: "ラウンド32",
-    dateLabel: "7/3",
-    home: { type: "group", group: "E", rank: 1 },
-    away: { type: "third", candidates: ["D", "E", "I", "J", "L"] },
-  },
-  {
-    id: "r32-8",
+    id: "m87",
+    matchNo: 87,
     round: "R32",
     label: "ラウンド32",
     dateLabel: "7/3",
     home: { type: "group", group: "K", rank: 1 },
     away: { type: "third", candidates: ["D", "E", "I", "J", "L"] },
-  },
-  {
-    id: "r32-9",
-    round: "R32",
-    label: "ラウンド32",
-    dateLabel: "7/4",
-    home: { type: "group", group: "J", rank: 1 },
-    away: { type: "group", group: "H", rank: 2 },
-  },
-  {
-    id: "r32-10",
-    round: "R32",
-    label: "ラウンド32",
-    dateLabel: "7/4",
-    home: { type: "group", group: "H", rank: 1 },
-    away: { type: "group", group: "J", rank: 2 },
-  },
-  {
-    id: "r32-11",
-    round: "R32",
-    label: "ラウンド32",
-    dateLabel: "7/5",
-    home: { type: "group", group: "D", rank: 2 },
-    away: { type: "group", group: "C", rank: 2 },
-  },
-  {
-    id: "r32-12",
-    round: "R32",
-    label: "ラウンド32",
-    dateLabel: "7/5",
-    home: { type: "group", group: "L", rank: 1 },
-    away: { type: "group", group: "I", rank: 2 },
-  },
-  {
-    id: "r32-13",
-    round: "R32",
-    label: "ラウンド32",
-    dateLabel: "7/6",
-    home: { type: "group", group: "D", rank: 1 },
-    away: { type: "group", group: "F", rank: 2 },
-  },
-  {
-    id: "r32-14",
-    round: "R32",
-    label: "ラウンド32",
-    dateLabel: "7/6",
-    home: { type: "group", group: "I", rank: 1 },
-    away: { type: "group", group: "C", rank: 2 },
-  },
-  {
-    id: "r32-15",
-    round: "R32",
-    label: "ラウンド32",
-    dateLabel: "7/7",
-    home: { type: "group", group: "L", rank: 2 },
-    away: { type: "group", group: "K", rank: 2 },
-  },
-  {
-    id: "r32-16",
-    round: "R32",
-    label: "ラウンド32",
-    dateLabel: "7/7",
-    home: { type: "group", group: "G", rank: 2 },
-    away: { type: "group", group: "A", rank: 2 },
   },
 ];
 
@@ -223,14 +241,15 @@ export function calculateGroupTables(teams: Team[], matches: Match[]): GroupTabl
   });
 }
 
-export function buildBracketProjection(tables: GroupTable[]): BracketProjection {
+export async function buildBracketProjection(tables: GroupTable[]): Promise<BracketProjection> {
   const thirdPlaceRankings = tables
     .map((table) => table.standings[2])
     .filter(Boolean)
     .sort(compareStandings);
 
   const qualifiedThirds = thirdPlaceRankings.slice(0, 8);
-  const thirdAssignments = assignThirdPlaceSlots(qualifiedThirds);
+  const thirdAssignments =
+    (await getOfficialThirdPlaceAssignments(qualifiedThirds)) ?? assignThirdPlaceSlots(qualifiedThirds);
 
   return {
     thirdPlaceRankings,
