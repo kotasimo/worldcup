@@ -59,7 +59,7 @@ export function LiveBracket({ initialData }: Props) {
         </div>
       </section>
 
-      <BracketBoard projection={data.projection} tables={data.tables} />
+      <BracketBoard liveTeamIds={data.liveTeamIds} projection={data.projection} tables={data.tables} />
     </>
   );
 }

@@ -48,7 +48,7 @@ const countryToCode: Record<string, string> = {
   portugal: "PT",
   qatar: "QA",
   "saudi arabia": "SA",
-  scotland: "GB",
+  scotland: "GB-SCT",
   senegal: "SN",
   serbia: "RS",
   "south africa": "ZA",
@@ -112,7 +112,7 @@ const tlaToCode: Record<string, string> = {
   POL: "PL",
   POR: "PT",
   QAT: "QA",
-  SCO: "GB",
+  SCO: "GB-SCT",
   SEN: "SN",
   SRB: "RS",
   SUI: "CH",
@@ -133,6 +133,10 @@ export function getFlagEmoji(name: string, tla?: string) {
 
   if (!code) {
     return "🏳️";
+  }
+
+  if (code.includes("-")) {
+    return "🏴";
   }
 
   return code

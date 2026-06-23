@@ -4,15 +4,18 @@ import { getFlagCode } from "@/lib/flags";
 import type { BracketMatch, BracketProjection, BracketSlot, GroupTable, Team, TeamStanding } from "@/lib/types";
 
 type Props = {
+  liveTeamIds: string[];
   projection: BracketProjection;
   tables: GroupTable[];
 };
 
 const r32Rows = [1, 3, 5, 7, 9, 11, 13, 15];
-const r16Rows = [2, 6, 10, 14];
-const qfRows = [4, 12];
+const bracketRowHeight = 58;
+const bracketHeight = bracketRowHeight * 16;
 
-export function BracketBoard({ projection, tables }: Props) {
+export function BracketBoard({ liveTeamIds, projection, tables }: Props) {
+  const liveTeams = new Set(liveTeamIds);
+
   return (
     <div className="layout">
       <aside className="panel">
@@ -25,7 +28,7 @@ export function BracketBoard({ projection, tables }: Props) {
                 <span>Pts</span>
               </div>
               {table.standings.map((standing) => (
-                <div className="teamRow" key={standing.team.id}>
+                <div className={`teamRow ${liveTeams.has(standing.team.id) ? "liveTeam" : ""}`} key={standing.team.id}>
                   <span className="rank">{standing.rank}</span>
                   <span className="teamName">
                     <TeamName team={standing.team} />
@@ -40,48 +43,16 @@ export function BracketBoard({ projection, tables }: Props) {
       </aside>
 
       <section className="panel bracketPanel">
-        <div className="bracketHead">
-          <span>ラウンド32</span>
-          <span>ラウンド16</span>
-          <span>準々決勝</span>
-          <span>準決勝</span>
-          <span>決勝</span>
-          <span>準決勝</span>
-          <span>準々決勝</span>
-          <span>ラウンド16</span>
-          <span>ラウンド32</span>
-        </div>
-
         <div className="bracketTree">
           <BracketLines />
 
           {projection.matches.slice(0, 8).map((match, index) => (
-            <MatchNode column={1} key={match.id} match={match} row={r32Rows[index]} />
+            <MatchNode column={1} key={match.id} liveTeams={liveTeams} match={match} row={r32Rows[index]} />
           ))}
 
           {projection.matches.slice(8, 16).map((match, index) => (
-            <MatchNode column={15} key={match.id} match={match} row={r32Rows[index]} />
+            <MatchNode column={15} key={match.id} liveTeams={liveTeams} match={match} row={r32Rows[index]} />
           ))}
-
-          <FutureNode column={3} matchNo={89} row={r16Rows[0]} />
-          <FutureNode column={3} matchNo={90} row={r16Rows[1]} />
-          <FutureNode column={3} matchNo={93} row={r16Rows[2]} />
-          <FutureNode column={3} matchNo={94} row={r16Rows[3]} />
-
-          <FutureNode column={13} matchNo={91} row={r16Rows[0]} />
-          <FutureNode column={13} matchNo={92} row={r16Rows[1]} />
-          <FutureNode column={13} matchNo={95} row={r16Rows[2]} />
-          <FutureNode column={13} matchNo={96} row={r16Rows[3]} />
-
-          <FutureNode column={5} matchNo={97} row={qfRows[0]} />
-          <FutureNode column={5} matchNo={98} row={qfRows[1]} />
-          <FutureNode column={11} matchNo={99} row={qfRows[0]} />
-          <FutureNode column={11} matchNo={100} row={qfRows[1]} />
-
-          <FutureNode column={7} matchNo={101} row={8} />
-          <FutureNode column={9} matchNo={102} row={8} />
-          <FinalNode />
-          <ThirdPlaceNode />
         </div>
       </section>
 
@@ -100,45 +71,14 @@ export function BracketBoard({ projection, tables }: Props) {
   );
 }
 
-function FutureNode({ column, matchNo, row }: { column: number; matchNo: number; row: number }) {
-  return (
-    <article className="treeMatch futureMatch" style={{ gridColumn: column, gridRow: `${row} / span 2` }}>
-      <div className="matchMeta">
-        <span>M{matchNo}</span>
-        <span />
-      </div>
-      <div className="slot futureSlot" />
-      <div className="slot futureSlot" />
-    </article>
-  );
-}
-
-function FinalNode() {
-  return (
-    <article className="finalMatch" style={{ gridColumn: 8, gridRow: "7 / span 4" }}>
-      <div className="finalTitle">決勝</div>
-      <div className="slot futureSlot" />
-      <div className="slot futureSlot" />
-    </article>
-  );
-}
-
-function ThirdPlaceNode() {
-  return (
-    <article className="thirdPlaceMatch" style={{ gridColumn: 8, gridRow: "13 / span 3" }}>
-      <div className="thirdPlaceTitle">3位決定戦</div>
-      <div className="slot futureSlot" />
-      <div className="slot futureSlot" />
-    </article>
-  );
-}
-
 function MatchNode({
   column,
+  liveTeams,
   match,
   row,
 }: {
   column: number;
+  liveTeams: Set<string>;
   match: BracketMatch;
   row: number;
 }) {
@@ -148,15 +88,15 @@ function MatchNode({
         <span>M{match.matchNo}</span>
         <span>{match.dateLabel}</span>
       </div>
-      <TeamSlot slot={match.home} />
-      <TeamSlot slot={match.away} />
+      <TeamSlot isLive={Boolean(match.home.team && liveTeams.has(match.home.team.team.id))} slot={match.home} />
+      <TeamSlot isLive={Boolean(match.away.team && liveTeams.has(match.away.team.team.id))} slot={match.away} />
     </article>
   );
 }
 
-function TeamSlot({ slot }: { slot: BracketSlot }) {
+function TeamSlot({ isLive, slot }: { isLive: boolean; slot: BracketSlot }) {
   return (
-    <div className={`slot ${slot.provisional ? "provisional" : ""}`}>
+    <div className={`slot ${slot.provisional ? "provisional" : ""} ${slot.locked ? "locked" : ""} ${isLive ? "liveSlot" : ""}`}>
       <span className="slotLabel">{slot.label}</span>
       <span className={`slotTeam ${slot.team ? "" : "empty"}`}>
         {slot.team ? (
@@ -165,31 +105,6 @@ function TeamSlot({ slot }: { slot: BracketSlot }) {
           "未定"
         )}
       </span>
-    </div>
-  );
-}
-
-function Connector({
-  column,
-  columnSpan = 1,
-  direction,
-  row,
-  slim = false,
-  span,
-}: {
-  column: number;
-  columnSpan?: number;
-  direction: "left" | "right";
-  row: number;
-  slim?: boolean;
-  span: number;
-}) {
-  return (
-    <div
-      className={`connector ${direction} ${slim ? "slim" : ""}`}
-      style={{ gridColumn: `${column} / span ${columnSpan}`, gridRow: `${row} / span ${span}` }}
-    >
-      <span />
     </div>
   );
 }
@@ -214,29 +129,45 @@ function formatGoalDifference(value: number) {
 }
 
 function BracketLines() {
+  const y = r32Rows.map((row) => (row - 1) * bracketRowHeight + bracketRowHeight);
+  const left = buildSidePaths(y, [170, 300, 470, 640, 752]);
+  const right = buildSidePaths(y, [1334, 1204, 1034, 864, 752]);
+
   return (
-    <svg className="bracketLines" viewBox="0 0 1504 768" preserveAspectRatio="none">
-      <path d="M170 48 H184 V96 H198 M170 144 H184" />
-      <path d="M170 240 H184 V288 H198 M170 336 H184" />
-      <path d="M170 432 H184 V480 H198 M170 528 H184" />
-      <path d="M170 624 H184 V672 H198 M170 720 H184" />
-
-      <path d="M354 96 H368 V192 H382 M354 288 H368" />
-      <path d="M354 480 H368 V576 H382 M354 672 H368" />
-      <path d="M528 192 H542 V384 H556 M528 576 H542" />
-      <path d="M692 384 H752" />
-
-      <path d="M1334 48 H1320 V96 H1306 M1334 144 H1320" />
-      <path d="M1334 240 H1320 V288 H1306 M1334 336 H1320" />
-      <path d="M1334 432 H1320 V480 H1306 M1334 528 H1320" />
-      <path d="M1334 624 H1320 V672 H1306 M1334 720 H1320" />
-
-      <path d="M1150 96 H1136 V192 H1122 M1150 288 H1136" />
-      <path d="M1150 480 H1136 V576 H1122 M1150 672 H1136" />
-      <path d="M976 192 H962 V384 H948 M976 576 H962" />
-      <path d="M812 384 H752" />
+    <svg className="bracketLines" viewBox={`0 0 1504 ${bracketHeight}`} preserveAspectRatio="none">
+      {left.map((path, index) => (
+        <path d={path} key={`left-${index}`} />
+      ))}
+      {right.map((path, index) => (
+        <path d={path} key={`right-${index}`} />
+      ))}
     </svg>
   );
+}
+
+function buildSidePaths(leafCenters: number[], xLevels: number[]) {
+  let currentYs = leafCenters;
+  const paths: string[] = [];
+
+  for (let level = 0; level < xLevels.length - 1; level += 1) {
+    const xStart = xLevels[level];
+    const xEnd = xLevels[level + 1];
+    const xJoin = xStart + (xEnd - xStart) * 0.72;
+    const nextYs: number[] = [];
+
+    for (let index = 0; index < currentYs.length; index += 2) {
+      const y1 = currentYs[index];
+      const y2 = currentYs[index + 1];
+      const yMid = (y1 + y2) / 2;
+      nextYs.push(yMid);
+
+      paths.push(`M${xStart} ${y1} H${xJoin} V${y2} H${xStart} M${xJoin} ${yMid} H${xEnd}`);
+    }
+
+    currentYs = nextYs;
+  }
+
+  return paths;
 }
 
 function TeamName({ team }: { team: Team }) {

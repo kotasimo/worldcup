@@ -99,8 +99,11 @@ h1 {
 }
 
 .bracketPanel {
+  --bracket-height: clamp(560px, calc(100vh - 205px), 928px);
+  --match-height: clamp(68px, calc((var(--bracket-height) / 8) - 10px), 104px);
   grid-column: 1 / -1;
   grid-row: 1;
+  overflow: hidden;
 }
 
 .layout > .panel:first-child {
@@ -162,6 +165,13 @@ h1 {
   background: rgba(255, 255, 255, 0.025);
 }
 
+.teamRow.liveTeam {
+  background: rgba(255, 210, 71, 0.22);
+  box-shadow:
+    inset 4px 0 0 #ffd247,
+    0 0 14px rgba(255, 210, 71, 0.16);
+}
+
 .rank {
   color: var(--muted);
 }
@@ -217,99 +227,40 @@ h1 {
   text-align: right;
 }
 
-.bracketHead {
-  color: var(--accent);
-  display: grid;
-  font-size: 12px;
-  font-weight: 900;
-  gap: 18px;
-  grid-template-columns: 170px 156px 146px 136px 120px 136px 146px 156px 170px;
-  margin: 0 auto 12px;
-  min-width: 1260px;
-  padding: 0 4px;
-  text-align: center;
-}
-
 .bracketTree {
   display: grid;
   gap: 0;
-  grid-template-columns: 170px 28px 156px 28px 146px 28px 136px 120px 136px 28px 146px 28px 156px 28px 170px;
-  grid-template-rows: repeat(16, 48px);
+  grid-template-columns: 170fr 28fr 156fr 28fr 146fr 28fr 136fr 120fr 136fr 28fr 146fr 28fr 156fr 28fr 170fr;
+  grid-template-rows: repeat(16, calc(var(--bracket-height) / 16));
+  height: var(--bracket-height);
   margin: 0 auto;
-  min-height: 768px;
-  min-width: 1260px;
   position: relative;
+  width: 100%;
 }
 
-.treeMatch,
-.finalMatch,
-.thirdPlaceMatch {
+.treeMatch {
   align-self: center;
-  background: rgba(255, 255, 255, 0.055);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 8px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
   display: grid;
-  gap: 5px;
-  min-height: 88px;
-  padding: 7px;
+  gap: clamp(4px, calc(var(--match-height) * 0.07), 7px);
+  grid-template-rows: 1fr 1fr;
+  height: var(--match-height);
+  min-width: 0;
+  overflow: visible;
+  padding: 0;
   position: relative;
   z-index: 2;
 }
 
-.futureMatch {
-  background: rgba(255, 255, 255, 0.035);
-}
-
-.futureMatch .slot {
-  min-height: 34px;
-}
-
-.finalMatch {
-  align-content: center;
-  background: rgba(255, 210, 71, 0.09);
-  border-color: rgba(255, 210, 71, 0.5);
-  min-height: 190px;
-}
-
-.thirdPlaceMatch {
-  align-content: center;
-  background: transparent;
-  border-color: transparent;
-  min-height: 130px;
-}
-
-.finalTitle {
-  color: var(--accent);
-  font-size: 17px;
-  font-weight: 900;
-  text-align: center;
-}
-
-.thirdPlaceTitle {
-  color: var(--accent);
-  font-size: 15px;
-  font-weight: 900;
-  text-align: center;
-}
-
-.championSlot {
-  background: rgba(255, 210, 71, 0.18);
-  border: 1px solid rgba(255, 210, 71, 0.7);
-  border-radius: 6px;
-  color: var(--accent);
-  font-size: 13px;
-  font-weight: 900;
-  margin-top: 2px;
-  padding: 7px;
-  text-align: center;
-}
-
 .matchMeta {
   color: var(--muted);
-  display: flex;
-  font-size: 11px;
+  display: none;
+  font-size: clamp(9px, calc(var(--match-height) * 0.105), 11px);
   justify-content: space-between;
   letter-spacing: 0.02em;
+  line-height: 1;
 }
 
 .slot {
@@ -317,16 +268,11 @@ h1 {
   border: 1px solid #c7d7ea;
   border-radius: 5px;
   color: #07111f;
-  min-height: 42px;
-  padding: 6px 8px;
-}
-
-.treeMatch:not(.futureMatch) .slot {
-  min-height: 34px;
-}
-
-.futureSlot {
-  background: rgba(238, 246, 255, 0.84);
+  display: flex;
+  align-items: center;
+  min-height: 0;
+  overflow: hidden;
+  padding: clamp(5px, calc(var(--match-height) * 0.08), 8px) 9px;
 }
 
 .slotLabel {
@@ -336,15 +282,16 @@ h1 {
   font-weight: 700;
 }
 
-.treeMatch:not(.futureMatch) .slotLabel {
+.treeMatch .slotLabel {
   display: none;
 }
 
 .slotTeam {
   align-items: center;
   display: block;
-  font-size: 13px;
+  font-size: clamp(11px, calc(var(--match-height) * 0.15), 14px);
   font-weight: 900;
+  line-height: 1.25;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -355,119 +302,24 @@ h1 {
   border-color: #f3d26d;
 }
 
+.locked {
+  border-color: #ff5f6d;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 95, 109, 0.9),
+    0 0 0 1px rgba(255, 95, 109, 0.35);
+}
+
+.liveSlot {
+  background: #fff1a8;
+  border-color: #ffb703;
+  box-shadow:
+    inset 4px 0 0 #ff7a00,
+    inset 0 0 0 1px rgba(255, 122, 0, 0.65),
+    0 0 18px rgba(255, 183, 3, 0.44);
+}
+
 .empty {
   color: #69788a;
-}
-
-.connector {
-  position: relative;
-  z-index: 1;
-}
-
-.connector::before,
-.connector::after,
-.connector span {
-  border-color: rgba(157, 190, 227, 0.72);
-  content: "";
-  position: absolute;
-}
-
-.connector::before,
-.connector::after {
-  border-top-style: solid;
-  border-top-width: 2px;
-  width: 100%;
-}
-
-.connector span {
-  border-top-style: solid;
-  border-top-width: 2px;
-  top: 50%;
-  width: 50%;
-}
-
-.connector.left {
-  border-right: 2px solid rgba(157, 190, 227, 0.72);
-}
-
-.connector.left::before,
-.connector.left::after {
-  left: 0;
-}
-
-.connector.left::before {
-  top: 25%;
-}
-
-.connector.left::after {
-  top: 75%;
-}
-
-.connector.left span {
-  right: 0;
-}
-
-.connector.right {
-  border-left: 2px solid rgba(157, 190, 227, 0.72);
-}
-
-.connector.right::before,
-.connector.right::after {
-  right: 0;
-}
-
-.connector.right::before {
-  top: 25%;
-}
-
-.connector.right::after {
-  top: 75%;
-}
-
-.connector.right span {
-  left: 0;
-}
-
-.connector.slim {
-  border-left: 0;
-  border-right: 0;
-}
-
-.connector.slim::before,
-.connector.slim::after {
-  display: none;
-}
-
-.connector.slim span {
-  left: 0;
-  width: 100%;
-}
-
-.centerFinalLine {
-  align-self: center;
-  border-left: 2px solid rgba(237, 245, 255, 0.82);
-  height: 58px;
-  justify-self: center;
-  position: relative;
-  width: 2px;
-  z-index: 1;
-}
-
-.centerFinalLine::before,
-.centerFinalLine::after {
-  border-top: 2px solid rgba(237, 245, 255, 0.82);
-  content: "";
-  position: absolute;
-  top: 50%;
-  width: 58px;
-}
-
-.centerFinalLine::before {
-  right: 0;
-}
-
-.centerFinalLine::after {
-  left: 0;
 }
 
 .thirdList {
@@ -544,11 +396,6 @@ h1 {
 
   .sourceBadge {
     text-align: left;
-  }
-
-  .bracketHead,
-  .bracketTree {
-    min-width: 1240px;
   }
 }
 

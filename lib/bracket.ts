@@ -241,7 +241,8 @@ export function calculateGroupTables(teams: Team[], matches: Match[]): GroupTabl
   });
 }
 
-export async function buildBracketProjection(tables: GroupTable[]): Promise<BracketProjection> {
+export async function buildBracketProjection(tables: GroupTable[], matches: Match[]): Promise<BracketProjection> {
+  const lockedRanks = getLockedGroupRanks(tables, matches);
   const thirdPlaceRankings = tables
     .map((table) => table.standings[2])
     .filter(Boolean)
@@ -259,11 +260,58 @@ export async function buildBracketProjection(tables: GroupTable[]): Promise<Brac
 
       return {
         ...template,
-        home: resolveSlot(template.home, tables, thirdAssignments, homeKey),
-        away: resolveSlot(template.away, tables, thirdAssignments, awayKey),
+        home: resolveSlot(template.home, tables, thirdAssignments, homeKey, lockedRanks),
+        away: resolveSlot(template.away, tables, thirdAssignments, awayKey, lockedRanks),
       };
     }),
   };
+}
+
+function getLockedGroupRanks(tables: GroupTable[], matches: Match[]) {
+  const locked = new Set<string>();
+
+  tables.forEach((table) => {
+    const groupMatches = matches.filter((match) => match.group === table.group);
+    const remainingByTeam = new Map<string, number>();
+
+    table.standings.forEach((standing) => {
+      remainingByTeam.set(standing.team.id, 0);
+    });
+
+    groupMatches.forEach((match) => {
+      if (match.homeScore !== null && match.awayScore !== null) {
+        return;
+      }
+
+      remainingByTeam.set(match.homeTeamId, (remainingByTeam.get(match.homeTeamId) ?? 0) + 1);
+      remainingByTeam.set(match.awayTeamId, (remainingByTeam.get(match.awayTeamId) ?? 0) + 1);
+    });
+
+    const hasRemaining = [...remainingByTeam.values()].some((remaining) => remaining > 0);
+
+    if (!hasRemaining) {
+      table.standings.forEach((standing) => {
+        locked.add(`${table.group}:${standing.rank}`);
+      });
+      return;
+    }
+
+    table.standings.forEach((standing, index) => {
+      const maxPoints = standing.points + (remainingByTeam.get(standing.team.id) ?? 0) * 3;
+      const aboveCannotBeCaught = table.standings
+        .slice(0, index)
+        .every((above) => above.points > maxPoints);
+      const belowCannotCatch = table.standings
+        .slice(index + 1)
+        .every((below) => standing.points > below.points + (remainingByTeam.get(below.team.id) ?? 0) * 3);
+
+      if (aboveCannotBeCaught && belowCannotCatch) {
+        locked.add(`${table.group}:${standing.rank}`);
+      }
+    });
+  });
+
+  return locked;
 }
 
 function compareStandings(a: TeamStanding, b: TeamStanding) {
@@ -310,6 +358,7 @@ function resolveSlot(
   tables: GroupTable[],
   thirdAssignments: Map<string, TeamStanding>,
   slotKey: string,
+  lockedRanks: Set<string>,
 ): BracketSlot {
   if (source.type === "group") {
     const team = tables.find((table) => table.group === source.group)?.standings[source.rank - 1];
@@ -317,6 +366,7 @@ function resolveSlot(
       label: `グループ${source.group} ${source.rank}位`,
       team,
       provisional: Boolean(team && team.played < 3),
+      locked: lockedRanks.has(`${source.group}:${source.rank}`),
     };
   }
 

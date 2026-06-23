@@ -56,6 +56,7 @@ export type BracketSlot = {
   label: string;
   team?: TeamStanding;
   provisional: boolean;
+  locked?: boolean;
 };
 
 export type BracketMatch = {
