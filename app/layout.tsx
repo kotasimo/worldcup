@@ -28,16 +28,14 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ja">
-      <head>
+      <body>
         <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9171958597513096"
           crossOrigin="anonymous"
-        >
-        </Script>
-      </head>
+          strategy="afterInteractive"
+        />
 
-      <body>
         {children}
 
         <footer className="siteFooter">
