@@ -240,7 +240,12 @@ function TeamName({ team }: { team: Team }) {
       ) : (
         <span className="flagFallback" />
       )}
-      <span>{getCountryNameJa(team)}</span>
+      <span className="countryFullName">{getCountryNameJa(team)}</span>
+      <span className="countryCodeName">{getTeamCode(team)}</span>
     </span>
   );
+}
+
+function getTeamCode(team: Team) {
+  return (team.tla || team.shortName || team.name).slice(0, 3).toUpperCase();
 }

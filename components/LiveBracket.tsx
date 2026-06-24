@@ -58,16 +58,15 @@ export function LiveBracket({ initialData }: Props) {
         <div>
           <p className="eyebrow">2026 FIFA World Cup</p>
           <h1>決勝トーナメント予測</h1>
-          <p className="siteLead">
-            グループ順位をもとに、<strong>リアルタイムで</strong>現時点の決勝トーナメント組み合わせを自動で反映します。
-            <a href="/about">サイト概要</a>
-          </p>
         </div>
         <div className={`sourceBadge ${data.state.isFallback ? "fallback" : "live"}`}>
-          <span>{data.state.source}</span>
           <strong>更新 {data.state.updatedAtLabel}</strong>
           <small>{data.state.isFallback ? data.state.message : clientStatus}</small>
         </div>
+        <p className="siteLead">
+          グループ順位をもとに、<strong>リアルタイムで</strong>現時点の決勝トーナメント組み合わせを自動で反映します。
+          <a href="/about">サイト概要</a>
+        </p>
       </section>
 
       <BracketBoard

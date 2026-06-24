@@ -33,9 +33,10 @@ body {
 
 .topbar {
   align-items: flex-end;
-  display: flex;
-  gap: 20px;
-  justify-content: space-between;
+  display: grid;
+  column-gap: 20px;
+  row-gap: 6px;
+  grid-template-columns: minmax(0, 1fr) auto;
   margin: 0 auto 18px;
   max-width: 1420px;
 }
@@ -73,9 +74,11 @@ code {
 .siteLead {
   color: var(--muted);
   font-size: 13px;
+  grid-column: 1 / -1;
   line-height: 1.55;
-  margin-top: 10px;
-  max-width: 620px;
+  margin-top: 0;
+  max-width: none;
+  white-space: nowrap;
 }
 
 .siteLead a {
@@ -101,10 +104,11 @@ code {
   border-radius: 8px;
   color: var(--muted);
   display: grid;
-  gap: 4px;
-  min-width: 190px;
-  padding: 10px 12px;
-  text-align: right;
+  gap: 3px;
+  justify-items: center;
+  min-width: 104px;
+  padding: 9px 11px;
+  text-align: center;
 }
 
 .sourceBadge strong {
@@ -306,10 +310,15 @@ code {
   vertical-align: middle;
 }
 
-.countryName span:last-child {
+.countryFullName,
+.countryCodeName {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.countryCodeName {
+  display: none;
 }
 
 .flagImage,
@@ -593,6 +602,39 @@ code {
   }
 }
 
+@media (max-width: 920px) {
+  .slot {
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+
+  .slotTeam {
+    font-size: 11px;
+  }
+
+  .slotTeam .countryName {
+    gap: 4px;
+  }
+
+  .slotTeam .flagImage,
+  .slotTeam .flagFallback {
+    flex-basis: 26px;
+    height: 18px;
+    width: 26px;
+  }
+
+  .slotTeam .countryFullName {
+    display: none;
+  }
+
+  .slotTeam .countryCodeName {
+    display: inline;
+    flex: 0 0 auto;
+    overflow: visible;
+    text-overflow: clip;
+  }
+}
+
 @media (max-width: 680px) {
   .page {
     padding: 14px;
@@ -600,14 +642,16 @@ code {
 
   .topbar {
     align-items: flex-start;
-    gap: 10px;
+    column-gap: 10px;
+    row-gap: 7px;
+    grid-template-columns: minmax(0, 1fr) auto;
   }
 
   .sourceBadge {
     gap: 2px;
-    min-width: 142px;
-    padding: 8px 9px;
-    text-align: right;
+    min-width: 98px;
+    padding: 7px 8px;
+    text-align: center;
   }
 
   .sourceBadge span {
@@ -626,7 +670,7 @@ code {
     font-size: 11px;
     line-height: 1.45;
     margin-top: 7px;
-    max-width: 300px;
+    white-space: normal;
   }
 
   .siteLead a {
@@ -636,11 +680,11 @@ code {
 
   .treeMatch {
     background: rgba(255, 255, 255, 0.045);
-    border: 1px solid rgba(255, 210, 71, 0.34);
-    border-radius: 7px;
+    border: 2px solid rgba(255, 210, 71, 0.48);
+    border-radius: 8px;
     gap: 2px;
     overflow: hidden;
-    padding: 3px;
+    padding: 2px;
   }
 
   .slot {
@@ -665,7 +709,8 @@ code {
     justify-content: center;
   }
 
-  .slotTeam .countryName span:last-child {
+  .slotTeam .countryFullName,
+  .slotTeam .countryCodeName {
     display: none;
   }
 
