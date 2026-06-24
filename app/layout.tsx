@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/react";
 
 export const metadata: Metadata = {
   title: "2026 FIFAワールドカップ 決勝トーナメント予測",
@@ -35,6 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Link href="/disclaimer">免責事項</Link>
           <Link href="/contact">お問い合わせ</Link>
         </footer>
+        <Analytics />
       </body>
     </html>
   );
