@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   title: "2026 FIFAワールドカップ 決勝トーナメント予測",
   description:
     "2026 FIFAワールドカップのグループ順位から決勝トーナメント表をリアルタイム生成。順位変動に応じて対戦カードを自動更新します。",
+  verification: {
+    google: "inCY9X6EfS7DuziuMJTwm5rjSSjLBhkFeuVmjzmDRfc",
+  },
   openGraph: {
     title: "2026 FIFAワールドカップ 決勝トーナメント予測",
     description:
@@ -29,7 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ja">
       <head>
-        <meta name="google-adsense-account" content="ca-pub-9171958597513096"/>
+        <meta name="google-adsense-account" content="ca-pub-9171958597513096" />
       </head>
       <body>
 
