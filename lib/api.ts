@@ -54,11 +54,12 @@ export async function fetchWorldCupState(): Promise<WorldCupState> {
     return {
       ...parsed,
       source: "football-data.org",
-      updatedAtLabel: new Intl.DateTimeFormat("ja-JP", {
+      updatedAtLabel: `${new Intl.DateTimeFormat("ja-JP", {
         hour: "2-digit",
         minute: "2-digit",
         second: "2-digit",
-      }).format(new Date()),
+        timeZone: "Asia/Tokyo",
+      }).format(new Date())} JST`,
       isFallback: false,
       message: `${parsed.matches.length} matches loaded from football-data.org.`,
     };
