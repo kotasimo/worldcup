@@ -65,7 +65,7 @@ export function LiveBracket({ initialData }: Props) {
         </div>
         <div className={`sourceBadge ${data.state.isFallback ? "fallback" : "live"}`}>
           <span>{data.state.source}</span>
-          <strong>{data.state.updatedAtLabel}</strong>
+          <strong>更新 {data.state.updatedAtLabel}</strong>
           <small>{data.state.isFallback ? data.state.message : clientStatus}</small>
         </div>
       </section>
