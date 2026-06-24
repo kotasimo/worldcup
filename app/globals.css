@@ -50,6 +50,17 @@ h1 {
   line-height: 1;
 }
 
+a {
+  color: #b8d9ff;
+}
+
+code {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  color: var(--accent);
+  padding: 2px 5px;
+}
+
 .eyebrow {
   color: var(--accent);
   font-size: 13px;
@@ -57,6 +68,31 @@ h1 {
   letter-spacing: 0;
   margin-bottom: 8px;
   text-transform: uppercase;
+}
+
+.siteLead {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+  margin-top: 10px;
+  max-width: 620px;
+}
+
+.siteLead a {
+  color: var(--accent);
+  font-weight: 800;
+  margin-left: 10px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.siteLead strong {
+  color: var(--accent);
+  font-weight: 900;
+}
+
+.siteLead a:hover {
+  text-decoration: underline;
 }
 
 .sourceBadge {
@@ -90,6 +126,67 @@ h1 {
   border-color: rgba(255, 210, 71, 0.48);
 }
 
+.adRail {
+  display: none;
+}
+
+.staticPage {
+  margin: 0 auto;
+  max-width: 860px;
+  min-height: calc(100vh - 72px);
+  padding: 32px 24px;
+}
+
+.staticPage h1 {
+  margin-bottom: 20px;
+}
+
+.staticPanel {
+  background: rgba(8, 19, 35, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  margin-top: 14px;
+  padding: 18px;
+}
+
+.staticPanel h2 {
+  color: var(--accent);
+  font-size: 17px;
+  margin: 0 0 10px;
+}
+
+.staticPanel p {
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.8;
+  margin-top: 10px;
+}
+
+.staticPanel p:first-of-type {
+  margin-top: 0;
+}
+
+.siteFooter {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 18px;
+  justify-content: center;
+  margin: 8px auto 0;
+  max-width: 1420px;
+  padding: 18px 24px 28px;
+}
+
+.siteFooter a {
+  color: var(--muted);
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.siteFooter a:hover {
+  color: var(--accent);
+}
+
 .layout {
   display: grid;
   gap: 18px;
@@ -99,7 +196,7 @@ h1 {
 }
 
 .bracketPanel {
-  --bracket-height: clamp(560px, calc(100vh - 205px), 928px);
+  --bracket-height: clamp(500px, calc(100vh - 285px), 860px);
   --match-height: clamp(68px, calc((var(--bracket-height) / 8) - 10px), 104px);
   grid-column: 1 / -1;
   grid-row: 1;
@@ -145,11 +242,25 @@ h1 {
   align-items: center;
   background: rgba(255, 255, 255, 0.07);
   color: var(--accent);
-  display: flex;
+  display: grid;
   font-size: 13px;
   font-weight: 800;
-  justify-content: space-between;
+  gap: 6px;
+  grid-template-columns: 22px minmax(0, 1fr) 28px 28px 28px 44px 58px;
   padding: 8px 10px;
+}
+
+.groupTitle > span:first-child {
+  grid-column: 1 / 3;
+}
+
+.groupColumns {
+  display: contents;
+}
+
+.groupColumns span {
+  text-align: center;
+  width: 100%;
 }
 
 .teamRow {
@@ -157,7 +268,7 @@ h1 {
   display: grid;
   font-size: 12px;
   gap: 6px;
-  grid-template-columns: 22px 1fr 26px 34px;
+  grid-template-columns: 22px minmax(0, 1fr) 28px 28px 28px 44px 58px;
   padding: 7px 10px;
 }
 
@@ -219,12 +330,23 @@ h1 {
 .pts {
   color: var(--accent);
   font-weight: 800;
-  text-align: right;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  width: 100%;
+}
+
+.record {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  width: 100%;
 }
 
 .gd {
   color: var(--muted);
-  text-align: right;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  width: 100%;
 }
 
 .bracketTree {
@@ -297,6 +419,17 @@ h1 {
   white-space: nowrap;
 }
 
+.slotTeam .countryName {
+  gap: 8px;
+}
+
+.slotTeam .flagImage,
+.slotTeam .flagFallback {
+  flex-basis: 28px;
+  height: 20px;
+  width: 28px;
+}
+
 
 .provisional {
   border-color: #f3d26d;
@@ -320,6 +453,78 @@ h1 {
 
 .empty {
   color: #69788a;
+}
+
+.liveMatches {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+.liveMatches h2 {
+  color: var(--accent);
+  font-size: 12px;
+  margin: 0 0 6px;
+}
+
+.liveMatchList {
+  display: grid;
+  gap: 6px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.liveMatchCard {
+  align-items: center;
+  background: rgba(255, 210, 71, 0.11);
+  border: 1px solid rgba(255, 210, 71, 0.34);
+  border-radius: 7px;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: auto minmax(0, 1fr) auto minmax(0, 1fr);
+  padding: 6px 9px;
+}
+
+.livePulse {
+  background: #ff7a00;
+  border-radius: 4px;
+  color: #07111f;
+  font-size: 10px;
+  font-weight: 900;
+  padding: 3px 5px;
+}
+
+.liveTeamSide {
+  font-size: 13px;
+  font-weight: 800;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.liveTeamSide.away {
+  text-align: right;
+}
+
+.liveScore {
+  align-items: center;
+  color: var(--text);
+  display: inline-flex;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  gap: 7px;
+  justify-content: center;
+  min-width: 54px;
+}
+
+.liveScore strong {
+  color: var(--accent);
+  font-size: 16px;
+}
+
+.liveEmpty {
+  color: var(--muted);
+  font-size: 12px;
 }
 
 .thirdList {
@@ -373,14 +578,18 @@ h1 {
   }
 
   .bracketPanel {
-    grid-column: auto;
-    grid-row: auto;
+    grid-column: 1;
+    grid-row: 1;
   }
 
-  .layout > .panel:first-child,
+  .layout > .panel:first-child {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
   .layout > .panel:last-child {
-    grid-column: auto;
-    grid-row: auto;
+    grid-column: 1;
+    grid-row: 3;
   }
 }
 
@@ -390,12 +599,68 @@ h1 {
   }
 
   .topbar {
-    align-items: stretch;
-    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
   }
 
   .sourceBadge {
-    text-align: left;
+    gap: 2px;
+    min-width: 142px;
+    padding: 8px 9px;
+    text-align: right;
+  }
+
+  .sourceBadge span {
+    font-size: 12px;
+  }
+
+  .sourceBadge strong {
+    font-size: 13px;
+  }
+
+  .sourceBadge small {
+    font-size: 10px;
+  }
+
+  .siteLead {
+    font-size: 11px;
+    line-height: 1.45;
+    margin-top: 7px;
+    max-width: 300px;
+  }
+
+  .siteLead a {
+    display: inline-block;
+    margin-left: 6px;
+  }
+}
+
+@media (min-width: 1760px) {
+  .adRail {
+    align-items: center;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.035));
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: rgba(237, 245, 255, 0.62);
+    display: flex;
+    font-size: 12px;
+    font-weight: 800;
+    height: min(560px, calc(100vh - 160px));
+    justify-content: center;
+    letter-spacing: 0.08em;
+    position: fixed;
+    top: 122px;
+    width: 160px;
+    z-index: 0;
+  }
+
+  .adRailLeft {
+    left: 40px;
+  }
+
+  .adRailRight {
+    right: 40px;
   }
 }
 

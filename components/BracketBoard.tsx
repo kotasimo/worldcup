@@ -1,10 +1,11 @@
 import Image from "next/image";
 import { getCountryNameJa } from "@/lib/country-names";
 import { getFlagCode } from "@/lib/flags";
-import type { BracketMatch, BracketProjection, BracketSlot, GroupTable, Team, TeamStanding } from "@/lib/types";
+import type { BracketMatch, BracketProjection, BracketSlot, GroupTable, Match, Team, TeamStanding } from "@/lib/types";
 
 type Props = {
   liveTeamIds: string[];
+  matches: Match[];
   projection: BracketProjection;
   tables: GroupTable[];
 };
@@ -13,8 +14,10 @@ const r32Rows = [1, 3, 5, 7, 9, 11, 13, 15];
 const bracketRowHeight = 58;
 const bracketHeight = bracketRowHeight * 16;
 
-export function BracketBoard({ liveTeamIds, projection, tables }: Props) {
+export function BracketBoard({ liveTeamIds, matches, projection, tables }: Props) {
   const liveTeams = new Set(liveTeamIds);
+  const teamsById = new Map(tables.flatMap((table) => table.standings.map((standing) => [standing.team.id, standing.team])));
+  const liveMatches = matches.filter((match) => match.status === "LIVE");
 
   return (
     <div className="layout">
@@ -25,7 +28,13 @@ export function BracketBoard({ liveTeamIds, projection, tables }: Props) {
             <section className="groupTable" key={table.group}>
               <div className="groupTitle">
                 <span>Group {table.group}</span>
-                <span>Pts</span>
+                <span className="groupColumns">
+                  <span>勝</span>
+                  <span>分</span>
+                  <span>負</span>
+                  <span>勝点</span>
+                  <span>得失点</span>
+                </span>
               </div>
               {table.standings.map((standing) => (
                 <div className={`teamRow ${liveTeams.has(standing.team.id) ? "liveTeam" : ""}`} key={standing.team.id}>
@@ -33,6 +42,9 @@ export function BracketBoard({ liveTeamIds, projection, tables }: Props) {
                   <span className="teamName">
                     <TeamName team={standing.team} />
                   </span>
+                  <span className="record">{standing.won}</span>
+                  <span className="record">{standing.drawn}</span>
+                  <span className="record">{standing.lost}</span>
                   <span className="pts">{standing.points}</span>
                   <span className="gd">{formatGoalDifference(standing.goalDifference)}</span>
                 </div>
@@ -54,6 +66,8 @@ export function BracketBoard({ liveTeamIds, projection, tables }: Props) {
             <MatchNode column={15} key={match.id} liveTeams={liveTeams} match={match} row={r32Rows[index]} />
           ))}
         </div>
+
+        <LiveMatches matches={liveMatches} teamsById={teamsById} />
       </section>
 
       <aside className="panel">
@@ -69,6 +83,45 @@ export function BracketBoard({ liveTeamIds, projection, tables }: Props) {
       </aside>
     </div>
   );
+}
+
+function LiveMatches({ matches, teamsById }: { matches: Match[]; teamsById: Map<string, Team> }) {
+  return (
+    <section className="liveMatches">
+      <h2>現在の試合</h2>
+      {matches.length > 0 ? (
+        <div className="liveMatchList">
+          {matches.map((match) => {
+            const home = teamsById.get(match.homeTeamId);
+            const away = teamsById.get(match.awayTeamId);
+
+            return (
+              <article className="liveMatchCard" key={match.id}>
+                <span className="livePulse">LIVE</span>
+                <div className="liveTeamSide">
+                  {home ? <TeamName team={home} /> : "未定"}
+                </div>
+                <div className="liveScore">
+                  <strong>{formatScore(match.homeScore)}</strong>
+                  <span>-</span>
+                  <strong>{formatScore(match.awayScore)}</strong>
+                </div>
+                <div className="liveTeamSide away">
+                  {away ? <TeamName team={away} /> : "未定"}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      ) : (
+        <p className="liveEmpty">現在進行中の試合はありません</p>
+      )}
+    </section>
+  );
+}
+
+function formatScore(score: number | null) {
+  return score === null ? "-" : String(score);
 }
 
 function MatchNode({
