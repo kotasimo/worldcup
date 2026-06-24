@@ -21,15 +21,21 @@ type ThirdPlaceRow = {
   assignments: Record<(typeof assignmentSlots)[number], GroupCode>;
 };
 
+const staticRows: ThirdPlaceRow[] = [
+  toThirdPlaceRow("ACDFGHJL", "CGJDAFLH"),
+];
+
 let cachedRows: ThirdPlaceRow[] | null = null;
 
 export async function getOfficialThirdPlaceAssignments(qualifiedThirds: TeamStanding[]) {
-  const rows = await getThirdPlaceRows();
   const standingsByGroup = new Map<GroupCode, TeamStanding>(
     qualifiedThirds.map((standing) => [standing.group, standing]),
   );
   const groupsKey = [...standingsByGroup.keys()].sort().join("");
-  const row = rows.find((item) => item.groupsKey === groupsKey);
+  const rows = await getThirdPlaceRows();
+  const row =
+    rows.find((item) => item.groupsKey === groupsKey) ??
+    staticRows.find((item) => item.groupsKey === groupsKey);
 
   if (!row) {
     return null;
@@ -104,4 +110,13 @@ function cleanCell(value: string) {
 
 function isGroupCode(value: string | undefined): value is GroupCode {
   return Boolean(value && "ABCDEFGHIJKL".includes(value));
+}
+
+function toThirdPlaceRow(groupsKey: string, assignmentKey: string): ThirdPlaceRow {
+  return {
+    groupsKey,
+    assignments: Object.fromEntries(
+      assignmentSlots.map((slot, index) => [slot, assignmentKey[index]]),
+    ) as Record<(typeof assignmentSlots)[number], GroupCode>,
+  };
 }

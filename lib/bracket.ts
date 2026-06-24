@@ -325,10 +325,8 @@ function compareStandings(a: TeamStanding, b: TeamStanding) {
 }
 
 function assignThirdPlaceSlots(qualifiedThirds: TeamStanding[]) {
-  const available = new Map<GroupCode, TeamStanding>(
-    qualifiedThirds.map((standing) => [standing.group, standing]),
-  );
   const assignment = new Map<string, TeamStanding>();
+  const slots: { key: string; candidates: GroupCode[] }[] = [];
 
   r32Templates
     .filter((template) => template.away.type === "third" || template.home.type === "third")
@@ -338,19 +336,57 @@ function assignThirdPlaceSlots(qualifiedThirds: TeamStanding[]) {
           return;
         }
 
-        const picked = qualifiedThirds.find(
-          (standing) => slot.candidates.includes(standing.group) && available.has(standing.group),
-        );
-
-        if (picked) {
-          const side = template.home === slot ? "home" : "away";
-          assignment.set(`${template.id}:${side}`, picked);
-          available.delete(picked.group);
-        }
+        const side = template.home === slot ? "home" : "away";
+        slots.push({ key: `${template.id}:${side}`, candidates: slot.candidates });
       });
     });
 
+  const standingsByGroup = new Map<GroupCode, TeamStanding>(
+    qualifiedThirds.map((standing) => [standing.group, standing]),
+  );
+  const rankingGroups = qualifiedThirds.map((standing) => standing.group);
+  const result = fitThirdPlaceSlots(slots, rankingGroups, new Set<GroupCode>());
+
+  if (result) {
+    result.forEach((group, index) => {
+      const standing = standingsByGroup.get(group);
+
+      if (standing) {
+        assignment.set(slots[index].key, standing);
+      }
+    });
+  }
+
   return assignment;
+}
+
+function fitThirdPlaceSlots(
+  slots: { key: string; candidates: GroupCode[] }[],
+  rankingGroups: GroupCode[],
+  used: Set<GroupCode>,
+): GroupCode[] | null {
+  if (used.size === slots.length) {
+    return [];
+  }
+
+  const slotIndex = used.size;
+  const slot = slots[slotIndex];
+
+  for (const group of rankingGroups) {
+    if (used.has(group) || !slot.candidates.includes(group)) {
+      continue;
+    }
+
+    used.add(group);
+    const rest = fitThirdPlaceSlots(slots, rankingGroups, used);
+    used.delete(group);
+
+    if (rest) {
+      return [group, ...rest];
+    }
+  }
+
+  return null;
 }
 
 function resolveSlot(
