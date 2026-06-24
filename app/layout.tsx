@@ -3,8 +3,24 @@ import Link from "next/link";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "World Cup Live Bracket",
-  description: "Current group standings projected into the 2026 knockout bracket.",
+  title: "2026 FIFAワールドカップ 決勝トーナメント予測",
+  description:
+    "2026 FIFAワールドカップのグループ順位から決勝トーナメント表をリアルタイム生成。順位変動に応じて対戦カードを自動更新します。",
+  openGraph: {
+    title: "2026 FIFAワールドカップ 決勝トーナメント予測",
+    description:
+      "グループ順位から決勝トーナメント表をリアルタイム生成。",
+    siteName: "World Cup Bracket Live",
+    images: ["/og-image.png"],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "2026 FIFAワールドカップ 決勝トーナメント予測",
+    description:
+      "グループ順位から決勝トーナメント表をリアルタイム生成。",
+    images: ["/og-image.png"],
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
