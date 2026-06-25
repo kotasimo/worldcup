@@ -201,7 +201,7 @@ code {
 
 .bracketPanel {
   --bracket-height: clamp(500px, calc(100vh - 285px), 860px);
-  --match-height: clamp(68px, calc((var(--bracket-height) / 8) - 10px), 104px);
+  --match-height: clamp(58px, calc((var(--bracket-height) / 8) - 20px), 96px);
   grid-column: 1 / -1;
   grid-row: 1;
   overflow: hidden;
@@ -371,11 +371,11 @@ code {
 
 .treeMatch {
   align-self: center;
-  background: transparent;
-  border: 0;
-  border-radius: 0;
+  background: rgba(255, 210, 71, 0.08);
+  border: 2px solid rgba(255, 210, 71, 0.78);
+  border-radius: 8px;
   display: grid;
-  gap: clamp(4px, calc(var(--match-height) * 0.07), 7px);
+  gap: 0;
   grid-template-rows: 1fr 1fr;
   height: var(--match-height);
   min-width: 0;
@@ -397,13 +397,29 @@ code {
 .slot {
   background: #eef6ff;
   border: 1px solid #c7d7ea;
-  border-radius: 5px;
+  border-radius: 0;
   color: #07111f;
   display: flex;
   align-items: center;
   min-height: 0;
   overflow: hidden;
   padding: clamp(5px, calc(var(--match-height) * 0.08), 8px) 9px;
+}
+
+.treeMatch .slot:nth-of-type(2) {
+  border-radius: 4px 4px 0 0;
+  border-bottom-color: rgba(7, 17, 31, 0.22);
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
+}
+
+.treeMatch .slot:nth-of-type(3) {
+  border-bottom: 0;
+  border-left: 0;
+  border-radius: 0 0 4px 4px;
+  border-right: 0;
+  border-top: 0;
 }
 
 .slotLabel {
@@ -445,17 +461,17 @@ code {
 }
 
 .locked {
-  border-color: #ff5f6d;
+  border-color: #21d37b;
   box-shadow:
-    inset 0 0 0 1px rgba(255, 95, 109, 0.9),
-    0 0 0 1px rgba(255, 95, 109, 0.35);
+    inset 0 0 0 2px rgba(33, 211, 123, 0.95),
+    0 0 0 1px rgba(33, 211, 123, 0.78),
+    0 0 14px rgba(33, 211, 123, 0.32);
 }
 
 .liveSlot {
   background: #fff1a8;
   border-color: #ffb703;
   box-shadow:
-    inset 4px 0 0 #ff7a00,
     inset 0 0 0 1px rgba(255, 122, 0, 0.65),
     0 0 18px rgba(255, 183, 3, 0.44);
 }
