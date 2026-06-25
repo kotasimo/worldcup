@@ -57,7 +57,7 @@ export function LiveBracket({ initialData }: Props) {
       <section className="topbar">
         <div>
           <p className="eyebrow">2026 FIFA World Cup</p>
-          <h1>決勝トーナメント予測</h1>
+          <h1>決勝トーナメント速報</h1>
         </div>
         <div className={`sourceBadge ${data.state.isFallback ? "fallback" : "live"}`}>
           <strong>更新 {data.state.updatedAtLabel}</strong>
