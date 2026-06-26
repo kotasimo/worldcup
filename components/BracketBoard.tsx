@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { getCountryNameJa } from "@/lib/country-names";
 import { getFlagCode } from "@/lib/flags";
+import { labels, type Locale } from "@/lib/i18n";
 import type { BracketMatch, BracketProjection, BracketSlot, GroupTable, Match, Team, TeamStanding } from "@/lib/types";
 
 type Props = {
@@ -8,13 +9,15 @@ type Props = {
   matches: Match[];
   projection: BracketProjection;
   tables: GroupTable[];
+  locale?: Locale;
 };
 
 const r32Rows = [1, 3, 5, 7, 9, 11, 13, 15];
 const bracketRowHeight = 58;
 const bracketHeight = bracketRowHeight * 16;
 
-export function BracketBoard({ liveTeamIds, matches, projection, tables }: Props) {
+export function BracketBoard({ liveTeamIds, matches, projection, tables, locale = "ja" }: Props) {
+  const t = labels[locale];
   const liveTeams = new Set(liveTeamIds);
   const teamsById = new Map(tables.flatMap((table) => table.standings.map((standing) => [standing.team.id, standing.team])));
   const liveMatches = matches.filter((match) => match.status === "LIVE");
@@ -22,25 +25,25 @@ export function BracketBoard({ liveTeamIds, matches, projection, tables }: Props
   return (
     <div className="layout">
       <aside className="panel">
-        <h2>グループ順位</h2>
+        <h2>{t.groupStandings}</h2>
         <div className="groups">
           {tables.map((table) => (
             <section className="groupTable" key={table.group}>
               <div className="groupTitle">
                 <span>Group {table.group}</span>
                 <span className="groupColumns">
-                  <span>勝</span>
-                  <span>分</span>
-                  <span>負</span>
-                  <span>勝点</span>
-                  <span>得失点</span>
+                  <span>{t.groupColumns.won}</span>
+                  <span>{t.groupColumns.drawn}</span>
+                  <span>{t.groupColumns.lost}</span>
+                  <span>{t.groupColumns.points}</span>
+                  <span>{t.groupColumns.goalDifference}</span>
                 </span>
               </div>
               {table.standings.map((standing) => (
                 <div className={`teamRow ${liveTeams.has(standing.team.id) ? "liveTeam" : ""}`} key={standing.team.id}>
                   <span className="rank">{standing.rank}</span>
                   <span className="teamName">
-                    <TeamName team={standing.team} />
+                    <TeamName locale={locale} team={standing.team} />
                   </span>
                   <span className="record">{standing.won}</span>
                   <span className="record">{standing.drawn}</span>
@@ -59,36 +62,36 @@ export function BracketBoard({ liveTeamIds, matches, projection, tables }: Props
           <BracketLines />
 
           {projection.matches.slice(0, 8).map((match, index) => (
-            <MatchNode column={1} key={match.id} liveTeams={liveTeams} match={match} row={r32Rows[index]} />
+            <MatchNode column={1} key={match.id} liveTeams={liveTeams} locale={locale} match={match} row={r32Rows[index]} />
           ))}
 
           {projection.matches.slice(8, 16).map((match, index) => (
-            <MatchNode column={15} key={match.id} liveTeams={liveTeams} match={match} row={r32Rows[index]} />
+            <MatchNode column={15} key={match.id} liveTeams={liveTeams} locale={locale} match={match} row={r32Rows[index]} />
           ))}
         </div>
 
-        <LiveMatches matches={liveMatches} teamsById={teamsById} />
+        <LiveMatches locale={locale} matches={liveMatches} teamsById={teamsById} />
       </section>
 
       <aside className="panel">
-        <h2>3位ランキング</h2>
+        <h2>{t.thirdPlaceRanking}</h2>
         <div className="thirdList">
           {projection.thirdPlaceRankings.map((standing, index) => (
-            <ThirdStanding standing={standing} index={index} key={standing.team.id} />
+            <ThirdStanding locale={locale} standing={standing} index={index} key={standing.team.id} />
           ))}
         </div>
-        <p className="note">
-          3位枠はAnnex C相当の割り当て表を参照します。表を取得できない場合のみ候補グループ内で暫定配置します。
-        </p>
+        <p className="note">{t.thirdPlaceNote}</p>
       </aside>
     </div>
   );
 }
 
-function LiveMatches({ matches, teamsById }: { matches: Match[]; teamsById: Map<string, Team> }) {
+function LiveMatches({ locale, matches, teamsById }: { locale: Locale; matches: Match[]; teamsById: Map<string, Team> }) {
+  const t = labels[locale];
+
   return (
     <section className="liveMatches">
-      <h2>現在の試合</h2>
+      <h2>{t.liveMatches}</h2>
       {matches.length > 0 ? (
         <div className="liveMatchList">
           {matches.map((match) => {
@@ -99,7 +102,7 @@ function LiveMatches({ matches, teamsById }: { matches: Match[]; teamsById: Map<
               <article className="liveMatchCard" key={match.id}>
                 <span className="livePulse">LIVE</span>
                 <div className="liveTeamSide">
-                  {home ? <TeamName team={home} /> : "未定"}
+                  {home ? <TeamName locale={locale} team={home} /> : t.tbd}
                 </div>
                 <div className="liveScore">
                   <strong>{formatScore(match.homeScore)}</strong>
@@ -107,14 +110,14 @@ function LiveMatches({ matches, teamsById }: { matches: Match[]; teamsById: Map<
                   <strong>{formatScore(match.awayScore)}</strong>
                 </div>
                 <div className="liveTeamSide away">
-                  {away ? <TeamName team={away} /> : "未定"}
+                  {away ? <TeamName locale={locale} team={away} /> : t.tbd}
                 </div>
               </article>
             );
           })}
         </div>
       ) : (
-        <p className="liveEmpty">現在進行中の試合はありません</p>
+        <p className="liveEmpty">{t.noLiveMatches}</p>
       )}
     </section>
   );
@@ -127,11 +130,13 @@ function formatScore(score: number | null) {
 function MatchNode({
   column,
   liveTeams,
+  locale,
   match,
   row,
 }: {
   column: number;
   liveTeams: Set<string>;
+  locale: Locale;
   match: BracketMatch;
   row: number;
 }) {
@@ -141,28 +146,30 @@ function MatchNode({
         <span>M{match.matchNo}</span>
         <span>{match.dateLabel}</span>
       </div>
-      <TeamSlot isLive={Boolean(match.home.team && liveTeams.has(match.home.team.team.id))} slot={match.home} />
-      <TeamSlot isLive={Boolean(match.away.team && liveTeams.has(match.away.team.team.id))} slot={match.away} />
+      <TeamSlot isLive={Boolean(match.home.team && liveTeams.has(match.home.team.team.id))} locale={locale} slot={match.home} />
+      <TeamSlot isLive={Boolean(match.away.team && liveTeams.has(match.away.team.team.id))} locale={locale} slot={match.away} />
     </article>
   );
 }
 
-function TeamSlot({ isLive, slot }: { isLive: boolean; slot: BracketSlot }) {
+function TeamSlot({ isLive, locale, slot }: { isLive: boolean; locale: Locale; slot: BracketSlot }) {
+  const t = labels[locale];
+
   return (
     <div className={`slot ${slot.provisional ? "provisional" : ""} ${slot.locked ? "locked" : ""} ${isLive ? "liveSlot" : ""}`}>
       <span className="slotLabel">{slot.label}</span>
       <span className={`slotTeam ${slot.team ? "" : "empty"}`}>
         {slot.team ? (
-          <TeamName team={slot.team.team} />
+          <TeamName locale={locale} team={slot.team.team} />
         ) : (
-          "未定"
+          t.tbd
         )}
       </span>
     </div>
   );
 }
 
-function ThirdStanding({ standing, index }: { standing: TeamStanding; index: number }) {
+function ThirdStanding({ locale, standing, index }: { locale: Locale; standing: TeamStanding; index: number }) {
   const qualifies = index < 8;
 
   return (
@@ -170,7 +177,7 @@ function ThirdStanding({ standing, index }: { standing: TeamStanding; index: num
       <span className="thirdRank">{index + 1}</span>
       <span>
         <span className="thirdGroup">Group {standing.group}</span>{" "}
-        <TeamName team={standing.team} />
+        <TeamName locale={locale} team={standing.team} />
       </span>
       <span className="thirdStatus">{qualifies ? "IN" : "OUT"}</span>
     </div>
@@ -223,7 +230,7 @@ function buildSidePaths(leafCenters: number[], xLevels: number[]) {
   return paths;
 }
 
-function TeamName({ team }: { team: Team }) {
+function TeamName({ locale, team }: { locale: Locale; team: Team }) {
   const code = getFlagCode(team.name, team.tla);
 
   return (
@@ -240,10 +247,14 @@ function TeamName({ team }: { team: Team }) {
       ) : (
         <span className="flagFallback" />
       )}
-      <span className="countryFullName">{getCountryNameJa(team)}</span>
+      <span className="countryFullName">{locale === "ja" ? getCountryNameJa(team) : getCountryNameEn(team)}</span>
       <span className="countryCodeName">{getTeamCode(team)}</span>
     </span>
   );
+}
+
+function getCountryNameEn(team: Team) {
+  return team.shortName || team.name;
 }
 
 function getTeamCode(team: Team) {

@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
-import Script from "next/script";
+import { HtmlLangSync } from "@/components/HtmlLangSync";
+import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://worldcup-chi-six.vercel.app"),
   title: "2026 FIFAワールドカップ 決勝トーナメント速報",
   description:
     "2026 FIFAワールドカップのグループ順位から決勝トーナメント表をリアルタイム生成。順位変動に応じて対戦カードを自動更新します。",
@@ -26,6 +27,13 @@ export const metadata: Metadata = {
       "グループ順位から決勝トーナメント表をリアルタイム生成。",
     images: ["/og-image.png"],
   },
+  alternates: {
+    canonical: "/",
+    languages: {
+      ja: "/",
+      en: "/en",
+    },
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -35,16 +43,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="google-adsense-account" content="ca-pub-9171958597513096" />
       </head>
       <body>
+        <HtmlLangSync />
 
         {children}
 
-        <footer className="siteFooter">
-          <Link href="/">トップ</Link>
-          <Link href="/about">サイト概要</Link>
-          <Link href="/privacy">プライバシーポリシー</Link>
-          <Link href="/disclaimer">免責事項</Link>
-          <Link href="/contact">お問い合わせ</Link>
-        </footer>
+        <SiteFooter />
 
         <Analytics />
       </body>
