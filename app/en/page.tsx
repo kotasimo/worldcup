@@ -19,14 +19,21 @@ export const metadata: Metadata = {
     title: "2026 FIFA World Cup Knockout Bracket Live",
     description: "Live knockout bracket from the current group standings.",
     siteName: "World Cup Bracket Live",
-    images: ["/og-image-en.png"],
+    images: [
+      {
+        url: "/og-image-en.png?v=en-20260627",
+        width: 1200,
+        height: 630,
+        alt: "2026 FIFA World Cup Knockout Bracket Live",
+      },
+    ],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "2026 FIFA World Cup Knockout Bracket Live",
     description: "Live knockout bracket from the current group standings.",
-    images: ["/og-image-en.png"],
+    images: ["/og-image-en.png?v=en-20260627"],
   },
 };
 
